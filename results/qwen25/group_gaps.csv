@@ -1,0 +1,9 @@
+profile,group,gap_vs_group_A,ci_low,ci_high,ci_excludes_zero
+strong,group_B,0.222,0.028,0.417,True
+strong,group_C,0.083,-0.056,0.222,False
+medium,group_B,0.222,0.056,0.389,True
+medium,group_C,0.056,-0.111,0.25,False
+weak,group_B,0.0,-0.333,0.306,False
+weak,group_C,-0.056,-0.361,0.222,False
+all,group_B,0.148,0.009,0.259,True
+all,group_C,0.028,-0.111,0.157,False
