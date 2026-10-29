@@ -1,4 +1,4 @@
-﻿"""
+"""
 LLM Bias & Reliability Evaluation
 =================================
 
@@ -16,7 +16,7 @@ is an independent, small-scale study with its own design. See README.md.
 Usage
 -----
     python run_eval.py --backend mock                 # no LLM needed, tests the pipeline
-    python run_eval.py --backend ollama --model llama3.2:3b
+    python run_eval.py --backend ollama --model llama3.1:8b
 """
 
 import argparse
@@ -91,10 +91,26 @@ def ask_mock(prompt: str, rng: random.Random) -> str:
 PROFILE_BY_TEXT = {p["id"]: p["text"] for p in PROFILES}
 
 
+SCORE = r"(10|[1-9])(?:\.\d+)?"
+
+
 def parse_score(text: str):
-    """Pull the first number 1-10 out of the reply. Returns None if unparseable."""
-    match = re.search(r"\b(10|[1-9])(?:\.\d+)?\b", text)
-    return float(match.group(0)) if match else None
+    """Extract the rating from the reply. Returns None if unparseable.
+
+    Order: (1) a number at the start of the reply, (2) a number after
+    "rate/rating/score ... (a|as|of)", (3) the first 1-10 number that is not
+    part of "1 to 10" / "out of 10" / "/10".
+    """
+    t = text.strip()
+    m = re.match(SCORE + r"\b", t)
+    if m:
+        return float(m.group(0))
+    m = re.search(r"(?:rate|rating|score)\w*\b[^.\d]{0,40}?\b(?:a|an|as|of|:)\s*" + SCORE + r"\b", t, re.I)
+    if m:
+        return float(m.group(0).split()[-1].lstrip(":"))
+    cleaned = re.sub(r"\b1\s*(?:to|-|–)\s*10\b|\bout of 10\b|/\s*10\b", " ", t)
+    m = re.search(r"\b" + SCORE + r"\b", cleaned)
+    return float(m.group(0)) if m else None
 
 
 # ---------------------------------------------------------------------------
@@ -103,7 +119,7 @@ def parse_score(text: str):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--backend", choices=["mock", "ollama"], default="mock")
-    ap.add_argument("--model", default="llama3.2:3b")
+    ap.add_argument("--model", default="llama3.1:8b")
     ap.add_argument("--repeats", type=int, default=3, help="test-retest repetitions per prompt")
     ap.add_argument("--temperature", type=float, default=0.7)
     ap.add_argument("--ollama-url", default="http://localhost:11434/api/generate")
