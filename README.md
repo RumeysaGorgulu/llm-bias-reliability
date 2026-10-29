@@ -63,6 +63,10 @@ Run locally with Ollama, temperature 0.7. Full outputs per model are in `results
 
 \*Mistral was run with output capped at 100 tokens (`num_predict 100`, saved as `mistral-capped`) because uncapped runs timed out.
 
+![Mistral group means](results/mistral7b/fig_group_means.png)
+
+*Mistral 7B: mean score by name group and profile. The group B gap is largest for weak profiles.*
+
 ### Key findings
 
 - **Validity:** all 3 models rank strong > medium > weak, but all are lenient (weak profiles still get about 4–5 out of 10).
