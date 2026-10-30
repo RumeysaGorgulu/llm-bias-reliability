@@ -94,11 +94,11 @@ def main():
         lines += ["> **Mock run.** These numbers come from a simulated rater with a built-in "
                   "effect, used only to test the pipeline. They are not findings about any LLM.", ""]
 
-    # --- Data quality of the instrument itself -----------------------------
+    # Data quality of the instrument itself
     lines += ["## 1. Response quality",
               f"- {len(raw)} prompts, **{parse_rate:.1%}** returned a usable number.", ""]
 
-    # --- Validity: does the score track candidate quality? ------------------
+    # Validity: does the score track candidate quality? 
     by_profile = df.groupby("profile")["score"].agg(["mean", "std", "count"]).reindex(["strong", "medium", "weak"])
     ordered = by_profile["mean"].is_monotonic_decreasing
     lines += ["## 2. Validity check (does the score follow candidate quality?)",
@@ -107,7 +107,7 @@ def main():
               f"- Ordering strong > medium > weak: **{'yes' if ordered else 'NO, interpret all results with caution'}**.",
               ""]
 
-    # --- Reliability --------------------------------------------------------
+    # Reliability 
     # Test-retest: same name, profile and template; columns = repeats
     retest = df.pivot_table(index=["name", "profile", "template"], columns="repeat", values="score")
     icc_retest = icc_oneway(retest)
@@ -138,7 +138,7 @@ def main():
               "- Rough guide (Koo & Li, 2016): <0.50 poor, 0.50-0.75 moderate, 0.75-0.90 good, >0.90 excellent.",
               ""]
 
-    # --- Bias ---------------------------------------------------------------
+    # Bias 
     gap_rows = []
     for profile in ["strong", "medium", "weak", "all"]:
         sub = df if profile == "all" else df[df["profile"] == profile]
@@ -166,7 +166,7 @@ def main():
               "the primary comparison.",
               ""]
 
-    # --- Figures ------------------------------------------------------------
+    # Figures
     groups = sorted(df["group"].unique())
     profiles = ["strong", "medium", "weak"]
     fig, ax = plt.subplots(figsize=(7, 4))
